@@ -14,27 +14,27 @@ class Sprite
         @frame = 0
         @current_sprite = 0
         @current_state = 0
-        @getShowingRect = ->
-            dim = @dimensions[@current_sprite]
-            x = dim.w * current_state
-            y = @sprite_start[@current_sprite]
-            {"x": x, "y": y, "w": dim.w, "h": dim.h}
-        @animate = (environment) ->
-            @frame += 1
-        @draw = (environment) ->
-            rect = @getShowingRect
-            environment.drawSprite(image, rect, @translate(pos))
-        @translate = (pos) -> pos
+    getShowingRect: ->
+        dim = @dimensions[@current_sprite]
+        x = dim.w * current_state
+        y = @sprite_start[@current_sprite]
+        {"x": x, "y": y, "w": dim.w, "h": dim.h}
+    animate: (environment) ->
+        @frame += 1
+    draw: (environment) ->
+        rect = @getShowingRect
+        environment.drawSprite(image, rect, @translate(pos))
+    translate: (pos) -> pos
 
 class Piece extends Sprite
     constructor: (pos, definition) ->
         super(pos, definition)
         @attributes = definition.attributes
-        @translate = (pos) ->
-            result = {}
-            result.x = pos.x - @attributes.base_points(@current_sprite).x
-            result.y = pos.y - @attributes.base_points(@current_sprite).y
-            result
+    translate: (pos) ->
+        result = {}
+        result.x = pos.x - @attributes.base_points(@current_sprite).x
+        result.y = pos.y - @attributes.base_points(@current_sprite).y
+        result
 
 class Attack extends Sprite
     constructor: (pos, definition, power, s_power, @owner) ->
@@ -47,8 +47,8 @@ class Attack extends Sprite
             when @type == "mixed" then (power + s_power) / 2
             else throw("Unrecognized attack type.")
         @power = @power * definition.multiplier
-        @translate = (pos) ->
-            result = {}
-            result.x = pos.x - @base_points(@current_sprite).x
-            result.y = pos.y - @base_points(@current_sprite).y
-            result
+    translate: (pos) ->
+        result = {}
+        result.x = pos.x - @base_points(@current_sprite).x
+        result.y = pos.y - @base_points(@current_sprite).y
+        result
