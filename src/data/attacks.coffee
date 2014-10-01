@@ -1,4 +1,4 @@
-[
+attacks = [
     {
         "class": "attack",
         "image": "src/attacks/0.png",

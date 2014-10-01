@@ -1,4 +1,4 @@
-[
+pieces = [
     {
         "class": "piece",
         "attributes": {
