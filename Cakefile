@@ -18,6 +18,8 @@ testCoffeeOpts = "--output #{testTargetJsDir}"
 
 dataCoffeeFiles = [
     "constants",
+    "stages",
+    "players",
     "pieces",
     "attacks",
 ]

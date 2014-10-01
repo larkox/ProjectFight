@@ -50,6 +50,10 @@ class MainMenuLoop extends Loop
                 environment.constants.MENU_BUTTONS_POS.y,
                 environment.constants.MENU_BUTTONS_WIDTH,
                 environment.constants.MENU_BUTTONS_HEIGHT)
+            rect = @calculateButtonSprite(environment)
+            pos = @calculateButtonPos(environment)
+            environment.drawSprite(@sel_buttons, rect, pos)
+            @state.dirty = false
         if @state.selected != @state.previous
             rect = @calculateClearArea(environment)
             environment.clear(rect)
@@ -85,4 +89,4 @@ class MainMenuLoop extends Loop
             when environment.constants.KEY_ENTER
                 switch @state.selected
                     when 0
-                        environment.loop = new GameLoop(environment, environment.data.player[0], environment.data.player[0], environment.data.stage[0])
+                        environment.loop = new GameLoop(environment, environment.data.players[0], environment.data.players[0], environment.data.stages[0])

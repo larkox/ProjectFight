@@ -10,7 +10,7 @@ class Environment
         @loading = true
         @constants = constants
         @keys = {}
-        @data = {"pieces": pieces, "attacks": attacks}
+        @data = {pieces, attacks, players, stages}
         document.onkeydown = (event) => @onKeyDown(event)
         document.onkeyup = (event) => @onKeyUp(event)
         document.onmousedown = (event) => @onMouseDown(event)
