@@ -1,7 +1,7 @@
 class Loop
     constructor: (environment) ->
         @state = {}
-    is_ready: -> true
+    isReady: -> true
     animate: (environment) ->
     draw: (environment) ->
     keyDownInput: (event) ->
@@ -23,7 +23,7 @@ class GameLoop extends Loop
         {l_stage, stage} = loadStage(stage)
         @state.l_stage = l_stage
         @state.stage = stage
-    is_ready: -> (state.l_p1._ & state.l_p2._ & state.l_stage._)
+    isReady: -> (state.l_p1._ & state.l_p2._ & state.l_stage._)
     animate: (environment) ->
         @p1.animate(environment)
         @p2.animate(environment)
