@@ -4,9 +4,11 @@ class Loop
     isReady: -> true
     animate: (environment) ->
     draw: (environment) ->
-    keyDownInput: (event) ->
-    touchInput: (event) ->
-    clickInput: (event) ->
+    onKeyDown: (event) ->
+    onKeyUp: (event) ->
+    onMouseDown: (event) ->
+    onMouseUp: (event) ->
+    onMouseMove: (event) ->
 
 class GameLoop extends Loop
     constructor: (environment, p1_def, p2_def, stage) ->
@@ -76,7 +78,7 @@ class MainMenuLoop extends Loop
         width = environment.constants.MENU_BUTTONS_WIDTH
         height = environment.constants.MENU_BUTTON_HEIGHT
         {"x": x, "y": y, "w": width, "h": height}
-    keyDownInput: (event) ->
+    onKeyDown: (event) ->
         switch event.keyCode
             when environment.constants.KEY_UP
                 @state.previous = @state.selected
