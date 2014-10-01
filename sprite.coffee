@@ -31,10 +31,9 @@ class Piece extends Sprite
         super(pos, definition)
         @attributes = definition.attributes
     translate: (pos) ->
-        result = {}
-        result.x = pos.x - @attributes.base_points(@current_sprite).x
-        result.y = pos.y - @attributes.base_points(@current_sprite).y
-        result
+        x = pos.x - @attributes.base_points(@current_sprite).x
+        y = pos.y - @attributes.base_points(@current_sprite).y
+        {"x": x, "y": y}
 
 class Attack extends Sprite
     constructor: (pos, definition, power, s_power, @owner) ->
@@ -48,7 +47,6 @@ class Attack extends Sprite
             else throw("Unrecognized attack type.")
         @power = @power * definition.multiplier
     translate: (pos) ->
-        result = {}
-        result.x = pos.x - @base_points(@current_sprite).x
-        result.y = pos.y - @base_points(@current_sprite).y
-        result
+        x = pos.x - @base_points(@current_sprite).x
+        y = pos.y - @base_points(@current_sprite).y
+        {"x": x, "y": y}
