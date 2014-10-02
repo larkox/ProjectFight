@@ -15,7 +15,7 @@ pieces = [
                 {"x":0, "y":0},
                 ],
         },
-        "image": "src/pieces/0.png",
+        "image": "src/images/pieces/0.png",
         "dimensions": [
             {"w": 80, "h": 80},
             {"w": 80, "h": 80},
@@ -46,7 +46,7 @@ pieces = [
                 {"x":0, "y":0},
                 ],
         },
-        "image": "src/pieces/0.png",
+        "image": "src/images/pieces/1.png",
         "dimensions": [
             {"w": 80, "h": 80},
             {"w": 80, "h": 80},
@@ -66,7 +66,7 @@ pieces = [
                 {"x":0, "y":0},
                 ],
         },
-        "image": "src/pieces/0.png",
+        "image": "src/images/pieces/2.png",
         "dimensions": [
             {"w": 80, "h": 80},
             {"w": 80, "h": 80},
@@ -87,7 +87,7 @@ pieces = [
                 {"x":0, "y":0},
                 ],
         },
-        "image": "src/pieces/0.png",
+        "image": "src/images/pieces/3.png",
         "dimensions": [
             {"w": 80, "h": 80},
             {"w": 80, "h": 80},
