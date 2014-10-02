@@ -9,7 +9,11 @@ class Player
             @body.attributes.weight +
             @head.attributes.weight +
             @arms.attributes.weight
-        @state = "idle"
+        @state = {
+            "crouch": false,
+            "jump": false,
+            "defend": false,
+        }
         @s_power = @head.attributes.special_power
         @a_power = @arms.attributes.power
         @l_power = @legs.attributes.power
@@ -104,21 +108,30 @@ class Player
         @legs.draw(environment)
         @bounding_rect = @getBoundingRect()
     animate: (environment) ->
-        if environment.keys[environment.constants.KEY_LEFT]
+        if environment.keys[environment.constants.KEY_LEFT] && @canMove()
             @pos.x -= @movement
             @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
-        if environment.keys[environment.constants.KEY_RIGHT]
+        if environment.keys[environment.constants.KEY_RIGHT] && @canMove()
             @pos.x += @movement
             @pos.x = Math.min(environment.loop.state.stage.width - environment.constants.LIMIT_RIGHT, @pos.x)
-        if environment.keys[environment.constants.KEY_UP] && @state == "idle"
+        if environment.keys[environment.constants.KEY_UP] && @canJump()
             @y_speed = @jump
-            @state = "jump"
-        @pos.y += Math.floor(@y_speed)
-        @y_speed -= environment.constants.GRAVITY
-        if @pos.y < 0
-            @pos.y = 0
-            @state = "idle"
-            @y_speed = 0
+            @state.jump = true
+        if environment.keys[environment.constants.KEY_DOWN] && @canCrouch()
+            @state.crouch = true
+        else
+            @state.crouch = false
+        if environment.keys[environment.constants.BUTTON_BLOCK] && @canBlock()
+            @state.block = true
+        else
+            @state.block = false
+        if @state.jump
+            @pos.y += Math.floor(@y_speed)
+            @y_speed -= environment.constants.GRAVITY
+            if @pos.y < 0
+                @pos.y = 0
+                @y_speed = 0
+                @state.jump = false
     calculateMovementMultiplier: ->
         rate = @weight / @max_weight
         if rate < 0 then 1.5
@@ -127,6 +140,14 @@ class Player
         else if rate < 0.90 then 0.50
         else if rate < 1 then 0.25
         else 0
+    canMove: ->
+        !@state.crouch & !@state.block
+    canJump: ->
+        !@state.crouch & !@state.jump & !@state.block
+    canCrouch: ->
+        !@state.jump
+    canBlock: ->
+        true
 
 
 loadPlayer = (environment, def, pos) ->
