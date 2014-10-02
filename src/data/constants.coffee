@@ -14,4 +14,9 @@ constants = {
 
     "P1_INIT_POS": {"x": 100, "y": 0},
     "P2_INIT_POS": {"x": 700, "y": 0},
+
+    "GRAVITY": 0.1,
+
+    "LIMIT_LEFT": 50,
+    "LIMIT_RIGHT": 50,
 }

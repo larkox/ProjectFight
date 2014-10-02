@@ -2,12 +2,12 @@ class Stage
     constructor: (def) ->
         {"loaded": @l_background, "content": @background} = loadImage(def.background_img)
         {"loaded": @l_foreground, "content": @foreground} = loadImage(def.foreground_img)
-        {@foreground_loc, @base_line} = def
+        {@foreground_loc, @base_line, @width} = def
         @dirty = true
     isReady: -> @l_background._ & @l_foreground._
     animate: (environment) ->
     draw: (environment) ->
-        #if @dirty
+        if @dirty
             rect = {
                 "x": environment.loop.state.scroll,
                 "y": 0,

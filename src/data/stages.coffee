@@ -4,5 +4,6 @@ stages = [
         "foreground_img": "src/images/stages/0_f.png",
         "foreground_loc": 325,
         "base_line": 405,
+        "width": 800,
     }
 ]

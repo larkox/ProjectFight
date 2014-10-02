@@ -4,8 +4,8 @@ pieces = [
         "attributes": {
             "type": "leg",
             "name": "Basic Legs",
-            "movement": 1.0,
-            "jump": 5.0,
+            "movement": 5.0,
+            "jump": 30.0,
             "weight": 5.0,
             "max_weight": 30.0,
             "power": 1.0,

@@ -9,7 +9,7 @@ class Player
             @body.attributes.weight +
             @head.attributes.weight +
             @arms.attributes.weight
-        @state = "iddle"
+        @state = "idle"
         @s_power = @head.attributes.special_power
         @a_power = @arms.attributes.power
         @l_power = @legs.attributes.power
@@ -20,6 +20,7 @@ class Player
         movement_multiplier = @calculateMovementMultiplier()
         @movement = Math.round(@legs.attributes.movement * movement_multiplier)
         @jump = @legs.attributes.jump * movement_multiplier
+        @y_speed = 0
         @bounding_rect = @getBoundingRect()
     isReady: ->
         @legs.isReady() &
@@ -105,8 +106,19 @@ class Player
     animate: (environment) ->
         if environment.keys[environment.constants.KEY_LEFT]
             @pos.x -= @movement
+            @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
         if environment.keys[environment.constants.KEY_RIGHT]
             @pos.x += @movement
+            @pos.x = Math.min(environment.loop.state.stage.width - environment.constants.LIMIT_RIGHT, @pos.x)
+        if environment.keys[environment.constants.KEY_UP] && @state == "idle"
+            @y_speed = @jump
+            @state = "jump"
+        @pos.y += Math.floor(@y_speed)
+        @y_speed -= Math.max(@weight, 0) * environment.constants.GRAVITY
+        if @pos.y < 0
+            @pos.y = 0
+            @state = "idle"
+            @y_speed = 0
     calculateMovementMultiplier: ->
         rate = @weight / @max_weight
         if rate < 0 then 1.5
