@@ -10,7 +10,7 @@ pieces = [
             "max_weight": 30.0,
             "power": 1.0,
             "base_points": [
-                {"x":0, "y":0},
+                {"x":40, "y":10},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],
@@ -27,21 +27,22 @@ pieces = [
         "attributes": {
             "type": "body",
             "name": "Basic Body",
+            "weight": 5.0,
             "defense": 1.0,
             "special_defense": 1.0,
             "hit_points": 100.0,
-            "leg_points": [
-                {"x":0, "y":0},
+            "legs_points": [
+                {"x":30, "y":60},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],
             "head_points": [
-                {"x":0, "y":0},
+                {"x":40, "y":20},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],
-            "arm_points": [
-                {"x":0, "y":0},
+            "arms_points": [
+                {"x":50, "y":30},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],
@@ -61,7 +62,7 @@ pieces = [
             "weight": 3.0,
             "special_power": 1.0,
             "base_points": [
-                {"x":0, "y":0},
+                {"x":30, "y":80},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],
@@ -82,7 +83,7 @@ pieces = [
             "power": 1.0,
             "defense": 1.0,
             "base_points": [
-                {"x":0, "y":0},
+                {"x":0, "y":40},
                 {"x":0, "y":0},
                 {"x":0, "y":0},
                 ],

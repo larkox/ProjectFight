@@ -27,6 +27,8 @@ dataCoffeeFiles = [
 prodCoffeeFiles = [
     "environment",
     "loop",
+    "player",
+    "stage",
     "sprite",
     "images",
 ]

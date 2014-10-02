@@ -20,10 +20,12 @@ class Environment
     drawSprite: (img, rect, pos) ->
         @layers[1].drawImage(img, rect.x, rect.y, rect.w, rect.h,
             pos.x, pos.y, rect.w, rect.h)
-    drawBackground: (img, x, y, w, h) ->
-        @layers[0].drawImage(img, x, y, w, h)
-    drawForeground: (img, x, y, w, h) ->
-        @layers[2].drawImage(img, x, y, w, h)
+    drawBackground: (img, rect, pos) ->
+        @layers[0].drawImage(img, rect.x, rect.y, rect.w, rect.h,
+            pos.x, pos.y, rect.w, rect.h)
+    drawForeground: (img, rect, pos) ->
+        @layers[2].drawImage(img, rect.x, rect.y, rect.w, rect.h,
+            pos.x, pos.y, rect.w, rect.h)
     clean: ->
         @layers[0].clearRect(0, 0, @width, @height)
         @layers[1].clearRect(0, 0, @width, @height)
@@ -35,6 +37,7 @@ class Environment
             @loading = !@loop.isReady()
             setTimeout((=> @tick()), @loop.frame_time)
         else
+            @loop.clear(this)
             @loop.animate(this)
             @loop.draw(this)
             setTimeout((=> @tick()), @loop.frame_time)

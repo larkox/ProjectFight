@@ -3,6 +3,7 @@ class Loop
         @state = {}
     isReady: -> true
     frame_time = 1000/32
+    clear: (environment) ->
     animate: (environment) ->
     draw: (environment) ->
     onKeyDown: (event, environment) ->
@@ -16,19 +17,23 @@ class GameLoop extends Loop
         super(environment)
         environment.clean()
         @state.dirty = true
+        @state.scroll = 0
         @frame_time = 1000/32
-        {"loaded": @l_p1, "content": @state.p1} = loadPlayer(p1_def)
-        {"loaded": @l_p2, "content": @state.p2} = loadPlayer(p2_def)
+        {"loaded": @l_p1, "content": @state.p1} = loadPlayer(environment, p1_def, environment.constants.P1_INIT_POS)
+        {"loaded": @l_p2, "content": @state.p2} = loadPlayer(environment, p2_def, environment.constants.P2_INIT_POS)
         {"loaded": @l_stage, "content": @state.stage} = loadStage(stage)
     isReady: -> (@l_p1._ & @l_p2._ & @l_stage._)
     animate: (environment) ->
-        @p1.animate(environment)
-        @p2.animate(environment)
-        @stage.animate(environment)
+        @state.p1.animate(environment)
+        @state.p2.animate(environment)
+        @state.stage.animate(environment)
     draw: (environment) ->
-        @p1.draw(environment)
-        @p2.draw(environment)
-        @stage.draw(environment)
+        @state.p1.draw(environment)
+        @state.p2.draw(environment)
+        @state.stage.draw(environment)
+    clear: (environment) ->
+        @state.p1.clear(environment)
+        @state.p2.clear(environment)
 
 class MainMenuLoop extends Loop
     constructor: (environment) ->
@@ -44,12 +49,28 @@ class MainMenuLoop extends Loop
     isReady: -> @l_background._ & @l_buttons._ & @l_sel_buttons._
     draw: (environment) ->
         if @state.dirty
-            environment.drawBackground(@background, 0, 0, environment.width, environment.height)
-            environment.drawBackground(@buttons,
-                environment.constants.MENU_BUTTONS_POS.x,
-                environment.constants.MENU_BUTTONS_POS.y,
-                environment.constants.MENU_BUTTONS_WIDTH,
-                environment.constants.MENU_BUTTONS_HEIGHT)
+            rect = {
+                "x": 0,
+                "y": 0,
+                "w": environment.width,
+                "h": environment.height,
+            }
+            pos = {
+                "x": 0,
+                "y": 0,
+            }
+            environment.drawBackground(@background, rect, pos)
+            rect = {
+                "x": 0,
+                "y": 0,
+                "w": environment.constants.MENU_BUTTONS_WIDTH,
+                "h": environment.constants.MENU_BUTTONS_HEIGHT,
+            }
+            pos = {
+                "x": environment.constants.MENU_BUTTONS_POS.x,
+                "y": environment.constants.MENU_BUTTONS_POS.y,
+            }
+            environment.drawBackground(@buttons, rect, pos)
             rect = @calculateButtonSprite(environment)
             pos = @calculateButtonPos(environment)
             environment.drawSprite(@sel_buttons, rect, pos)
@@ -90,3 +111,4 @@ class MainMenuLoop extends Loop
                 switch @state.selected
                     when 0
                         environment.loop = new GameLoop(environment, environment.data.players[0], environment.data.players[0], environment.data.stages[0])
+                        environment.loading = true
