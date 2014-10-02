@@ -114,7 +114,7 @@ class Player
             @y_speed = @jump
             @state = "jump"
         @pos.y += Math.floor(@y_speed)
-        @y_speed -= Math.max(@weight, 0) * environment.constants.GRAVITY
+        @y_speed -= environment.constants.GRAVITY
         if @pos.y < 0
             @pos.y = 0
             @state = "idle"
