@@ -4,6 +4,7 @@ class Player
         @body = new Piece(pos, environment.data.pieces[def.body])
         @head = new Piece(pos, environment.data.pieces[def.head])
         @arms = new Piece(pos, environment.data.pieces[def.arms])
+        {"loaded": @l_jump_sound, "content": @jump_sound} = loadSound(environment, "src/sound/jump_001.ogg")
         @max_weight = @legs.attributes.max_weight
         @weight = @legs.attributes.weight +
             @body.attributes.weight +
@@ -30,7 +31,8 @@ class Player
         @legs.isReady() &
         @body.isReady() &
         @head.isReady() &
-        @arms.isReady()
+        @arms.isReady() &
+        @l_jump_sound._
     getBoundingRect: ->
         x = @legs.pos.x
         x2 = @legs.pos.x + @legs.dimensions[@legs.current_sprite].w
@@ -71,8 +73,8 @@ class Player
         scroll = environment.loop.state.scroll
         base = environment.loop.state.stage.base_line
         legs_point = {}
-        legs_point.x = @pos.x - scroll - @legs.image.width/2
-        legs_point.y = base - @pos.y - @legs.image.height
+        legs_point.x = @pos.x - scroll - @legs.dimensions[@legs.current_sprite].w/2
+        legs_point.y = base - @pos.y - @legs.dimensions[@legs.current_sprite].h
         @legs.pos = legs_point
 
         body_point = {}
@@ -117,14 +119,15 @@ class Player
         if environment.keys[environment.constants.KEY_UP] && @canJump()
             @y_speed = @jump
             @state.jump = true
+            playSound(environment, @jump_sound._)
         if environment.keys[environment.constants.KEY_DOWN] && @canCrouch()
             @state.crouch = true
         else
             @state.crouch = false
-        if environment.keys[environment.constants.BUTTON_BLOCK] && @canBlock()
-            @state.block = true
+        if environment.keys[environment.constants.BUTTON_BLOCK] && @canDefend()
+            @state.defend = true
         else
-            @state.block = false
+            @state.defend = false
         if @state.jump
             @pos.y += Math.floor(@y_speed)
             @y_speed -= environment.constants.GRAVITY
@@ -132,6 +135,10 @@ class Player
                 @pos.y = 0
                 @y_speed = 0
                 @state.jump = false
+        @legs.animate(@state, environment)
+        @body.animate(@state, environment)
+        @head.animate(@state, environment)
+        @arms.animate(@state, environment)
     calculateMovementMultiplier: ->
         rate = @weight / @max_weight
         if rate < 0 then 1.5
@@ -141,12 +148,12 @@ class Player
         else if rate < 1 then 0.25
         else 0
     canMove: ->
-        !@state.crouch & !@state.block
+        !@state.crouch & !@state.defend
     canJump: ->
-        !@state.crouch & !@state.jump & !@state.block
+        !@state.crouch & !@state.jump & !@state.defend
     canCrouch: ->
         !@state.jump
-    canBlock: ->
+    canDefend: ->
         true
 
 

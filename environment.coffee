@@ -11,6 +11,7 @@ class Environment
         @constants = constants
         @keys = {}
         @data = {pieces, attacks, players, stages}
+        @sound_context = new AudioContext()
         document.onkeydown = (event) => @onKeyDown(event)
         document.onkeyup = (event) => @onKeyUp(event)
         document.onmousedown = (event) => @onMouseDown(event)
@@ -32,6 +33,8 @@ class Environment
         @layers[2].clearRect(0, 0, @width, @height)
     clear: ({x,y,w,h}) ->
         @layers[1].clearRect(x, y, w, h)
+    clearForeground: ({x, y, w, h}) ->
+        @layers[2].clearRect(x, y, w, h)
     tick: ->
         if @loading
             @loading = !@loop.isReady()

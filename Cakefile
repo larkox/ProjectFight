@@ -25,6 +25,7 @@ dataCoffeeFiles = [
 ]
 
 prodCoffeeFiles = [
+    "sound",
     "environment",
     "loop",
     "player",
