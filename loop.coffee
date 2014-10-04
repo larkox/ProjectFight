@@ -19,8 +19,8 @@ class GameLoop extends Loop
         @state.dirty = true
         @state.scroll = 0
         @frame_time = 1000/32
-        {"loaded": @l_p1, "content": @state.p1} = loadPlayer(environment, p1_def, environment.constants.P1_INIT_POS)
-        {"loaded": @l_p2, "content": @state.p2} = loadPlayer(environment, p2_def, environment.constants.P2_INIT_POS)
+        {"loaded": @l_p1, "content": @state.p1} = loadPlayer(environment, p1_def, environment.constants.P1_INIT_POS, 1)
+        {"loaded": @l_p2, "content": @state.p2} = loadPlayer(environment, p2_def, environment.constants.P2_INIT_POS, 0)
         {"loaded": @l_stage, "content": @state.stage} = loadStage(stage)
     isReady: -> (@l_p1._ & @l_p2._ & @l_stage._)
     animate: (environment) ->

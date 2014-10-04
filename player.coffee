@@ -1,5 +1,5 @@
 class Player
-    constructor: (environment, def, @pos) ->
+    constructor: (environment, def, @pos, human) ->
         @legs = new Piece(pos, environment.data.pieces[def.legs])
         @body = new Piece(pos, environment.data.pieces[def.body])
         @head = new Piece(pos, environment.data.pieces[def.head])
@@ -24,9 +24,15 @@ class Player
         @hit_points = @body.attributes.hit_points
         movement_multiplier = @calculateMovementMultiplier()
         @movement = Math.round(@legs.attributes.movement * movement_multiplier)
-        @jump = @legs.attributes.jump * movement_multiplier
+        @jump_strength = @legs.attributes.jump * movement_multiplier
         @y_speed = 0
         @bounding_rect = @getBoundingRect()
+        if (human == 1)
+            @animation_behaviour = animateAsP1
+        else if human == 2
+            @animation_behaviour = animateAsP2
+        else
+            @animation_behaviour = animateAsCPU
     isReady: ->
         @legs.isReady() &
         @body.isReady() &
@@ -110,24 +116,7 @@ class Player
         @legs.draw(environment)
         @bounding_rect = @getBoundingRect()
     animate: (environment) ->
-        if environment.keys[environment.constants.KEY_LEFT] && @canMove()
-            @pos.x -= @movement
-            @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
-        if environment.keys[environment.constants.KEY_RIGHT] && @canMove()
-            @pos.x += @movement
-            @pos.x = Math.min(environment.loop.state.stage.width - environment.constants.LIMIT_RIGHT, @pos.x)
-        if environment.keys[environment.constants.KEY_UP] && @canJump()
-            @y_speed = @jump
-            @state.jump = true
-            playSound(environment, @jump_sound._)
-        if environment.keys[environment.constants.KEY_DOWN] && @canCrouch()
-            @state.crouch = true
-        else
-            @state.crouch = false
-        if environment.keys[environment.constants.BUTTON_BLOCK] && @canDefend()
-            @state.defend = true
-        else
-            @state.defend = false
+        @animation_behaviour(environment, this)
         if @state.jump
             @pos.y += Math.floor(@y_speed)
             @y_speed -= environment.constants.GRAVITY
@@ -155,12 +144,20 @@ class Player
         !@state.jump
     canDefend: ->
         true
+    move: (environment, direction) ->
+        @pos.x += @movement * direction
+        @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
+        @pos.x = Math.min(environment.loop.state.stage.width - environment.constants.LIMIT_RIGHT, @pos.x)
+    jump: (environment) ->
+        @y_speed = @jump_strength
+        @state.jump = true
+        playSound(environment, @jump_sound._)
 
 
-loadPlayer = (environment, def, pos) ->
+loadPlayer = (environment, def, pos, human) ->
     result = {
         "loaded": {"_": false},
-        "content": new Player(environment, def, pos)
+        "content": new Player(environment, def, pos, human)
     }
     check = (result) ->
         if result.content.isReady()
@@ -169,3 +166,40 @@ loadPlayer = (environment, def, pos) ->
             setTimeout((-> check(result)), 100)
     check(result)
     result
+
+animateAsP1 = (environment, player) ->
+    if environment.keys[environment.constants.KEY_LEFT] && player.canMove()
+        player.move(environment, -1)
+    if environment.keys[environment.constants.KEY_RIGHT] && player.canMove()
+        player.move(environment, +1)
+    if environment.keys[environment.constants.KEY_UP] && player.canJump()
+        player.jump(environment)
+    if environment.keys[environment.constants.KEY_DOWN] && player.canCrouch()
+        player.state.crouch = true
+    else
+        player.state.crouch = false
+    if environment.keys[environment.constants.BUTTON_BLOCK] && player.canDefend()
+        player.state.defend = true
+    else
+        player.state.defend = false
+
+animateAsCPU = (environment, player) ->
+    foe = if environment.loop.state.p1 == player then environment.loop.state.p2 else environment.loop.state.p1
+    if foe.state.jump & player.canCrouch()
+        player.state.crouch = true
+    else if foe.state.crouch & player.canJump()
+        player.jump(environment)
+    else if 0 < Math.abs(foe.pos.x - player.pos.x) < 30 & player.canDefend()
+        player.state.defend = true
+    else if 0 < (foe.pos.x - player.pos.x) < 60 & player.canMove()
+        player.move(environment, -1)
+    else if 0 > (foe.pos.x - player.pos.x) > -60 & player.canMove()
+        player.move(environment, +1)
+    else if (foe.pos.x - player.pos.x) >= 80
+        player.state.crouch = false
+        player.state.defend = false
+        player.move(environment, +1)
+    else if (foe.pos.x - player.pos.x) <= -80
+        player.state.crouch = false
+        player.state.defend = false
+        player.move(environment, -1)
