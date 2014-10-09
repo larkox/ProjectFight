@@ -84,30 +84,35 @@ class Player
         @legs.pos = legs_point
 
         body_point = {}
+        legs_base_point = @legs.getBasePoint()
+        body_base_points = @body.getBasePoint()
+        head_base_point = @head.getBasePoint()
+        arms_base_point = @arms.getBasePoint()
+
         body_point.x = legs_point.x +
-            @legs.attributes.base_points[@legs.current_sprite].x -
-            @body.attributes.legs_points[@body.current_sprite].x
+            legs_base_point.x -
+            body_base_points[0].x
         body_point.y = legs_point.y +
-            @legs.attributes.base_points[@legs.current_sprite].y -
-            @body.attributes.legs_points[@body.current_sprite].y
+            legs_base_point.y -
+            body_base_points[0].y
         @body.pos = body_point
 
         head_point = {}
         head_point.x = body_point.x +
-            @body.attributes.head_points[@body.current_sprite].x -
-            @head.attributes.base_points[@head.current_sprite].x
+            body_base_points[1].x -
+            head_base_point.x
         head_point.y = body_point.y +
-            @body.attributes.head_points[@body.current_sprite].y -
-            @head.attributes.base_points[@head.current_sprite].y
+            body_base_points[1].y -
+            head_base_point.y
         @head.pos = head_point
 
         arms_point = {}
         arms_point.x = body_point.x +
-            @body.attributes.arms_points[@body.current_sprite].x -
-            @arms.attributes.base_points[@arms.current_sprite].x
+            body_base_points[2].x -
+            arms_base_point.x
         arms_point.y = body_point.y +
-            @body.attributes.arms_points[@body.current_sprite].y -
-            @arms.attributes.base_points[@arms.current_sprite].y
+            body_base_points[2].y -
+            arms_base_point.y
         @arms.pos = arms_point
 
         @head.draw(environment)
@@ -148,6 +153,11 @@ class Player
         @pos.x += @movement * direction
         @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
         @pos.x = Math.min(environment.loop.state.stage.width - environment.constants.LIMIT_RIGHT, @pos.x)
+        @direction = if direction == -1 then 1 else 0
+        @legs.direction = @direction
+        @head.direction = @direction
+        @arms.direction = @direction
+        @body.direction = @direction
     jump: (environment) ->
         @y_speed = @jump_strength
         @state.jump = true

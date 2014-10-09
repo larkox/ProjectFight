@@ -11,10 +11,11 @@ class Sprite
         @frame = 0
         @current_sprite = 0
         @current_state = 0
+        @direction = 0
     isReady: -> @l_image._
     getShowingRect: ->
         dim = @dimensions[@current_sprite]
-        x = dim.w * @current_state
+        x = (@direction * @image.width / 2) + (dim.w * @current_state)
         y = @sprite_start[@current_sprite]
         {"x": x, "y": y, "w": dim.w, "h": dim.h}
     animate: (environment) ->
@@ -32,6 +33,15 @@ class Piece extends Sprite
     animate: (player_state, environment) ->
         @updateCurrentSprite(player_state)
         super(environment)
+    getBasePoint: ->
+        if @attributes.base_points
+            @attributes.base_points[@current_sprite][@direction]
+        else
+            [
+                @attributes.legs_points[@current_sprite][@direction],
+                @attributes.head_points[@current_sprite][@direction],
+                @attributes.arms_points[@current_sprite][@direction],
+            ]
     updateCurrentSprite: (player_state) ->
         if !player_state.defend
             if player_state.crouch && @current_sprite != 1
