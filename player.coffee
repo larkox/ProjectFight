@@ -14,6 +14,7 @@ class Player
             "crouch": false,
             "jump": false,
             "defend": false,
+            "attack": false,
         }
         @s_power = @head.attributes.special_power
         @a_power = @arms.attributes.power
@@ -33,6 +34,10 @@ class Player
             @animation_behaviour = animateAsP2
         else
             @animation_behaviour = animateAsCPU
+        @attacks = AttackDefinition.loadAttacks(environment, def.attacks)
+        @attack_info = {}
+        @frame = 0
+        @direction = 0
     isReady: ->
         @legs.isReady() &
         @body.isReady() &
@@ -121,6 +126,7 @@ class Player
         @legs.draw(environment)
         @bounding_rect = @getBoundingRect()
     animate: (environment) ->
+        @frame += 1
         @animation_behaviour(environment, this)
         if @state.jump
             @pos.y += Math.floor(@y_speed)
@@ -129,10 +135,31 @@ class Player
                 @pos.y = 0
                 @y_speed = 0
                 @state.jump = false
-        @legs.animate(@state, environment)
-        @body.animate(@state, environment)
-        @head.animate(@state, environment)
-        @arms.animate(@state, environment)
+        if @state.attack
+            if (!@attack_info.attack_started &
+                    @attack_info.attack_holder.current_state == @attack_info.start_frame)
+                environment.loop.attacks.push(new Attack(
+                    @getAttackPos()
+                    @attacks[@attack_info.type],
+                    @power,
+                    @special_power,
+                    @))
+                @attack_info.attack_started = true
+            if (@frame > @attack_info.last_frame)
+                @frame = 0
+                @state.attack = false
+        @legs.animate(@, environment)
+        @body.animate(@, environment)
+        @head.animate(@, environment)
+        @arms.animate(@, environment)
+    getAttackPos: ->
+        base = @attack_info.attack_holder.pos
+        holder_offset = @attack_info.attack_holder.attributes.attack_base_points[@attack_info.current_sprite - @attack_info.offset][@direction]
+        attack_offset = @attacks[@attack_info.type].base_points[0][@direction]
+        {
+            "x": base.x + holder_offset.x - attack_offset.x,
+            "y": base.y + holder_offset.y - attack_offset.y,
+        }
     calculateMovementMultiplier: ->
         rate = @weight / @max_weight
         if rate < 0 then 1.5
@@ -142,13 +169,22 @@ class Player
         else if rate < 1 then 0.25
         else 0
     canMove: ->
-        !@state.crouch & !@state.defend
+        !@state.crouch &
+        !@state.defend &
+        (!@state.attack || @state.jump)
     canJump: ->
-        !@state.crouch & !@state.jump & !@state.defend
+        !@state.crouch &
+        !@state.jump &
+        !@state.defend &
+        !@state.attack
     canCrouch: ->
-        !@state.jump
+        !@state.jump &
+        !@state.attack
     canDefend: ->
-        true
+        !@state.attack
+    canAttack: ->
+        !@state.attack &
+        !@state.defend
     move: (environment, direction) ->
         @pos.x += @movement * direction
         @pos.x = Math.max(environment.constants.LIMIT_LEFT, @pos.x)
@@ -162,7 +198,25 @@ class Player
         @y_speed = @jump_strength
         @state.jump = true
         playSound(environment, @jump_sound._)
-
+    attack: (type) ->
+        @attack_info = {}
+        @attack_info.type = type
+        @attack_info.current_sprite = switch
+            when type == "high_punch" then 4
+            when type == "medium_punch" then 5
+            when type == "special_punch_1" then 6
+            when type == "special_punch_2" then 7
+            when type == "medium_kick" then 8
+            when type == "low_kick" then 9
+            when type == "special_kick_1" then 10
+            when type == "special_kick_2" then 11
+        @attack_info.attack_holder = if @attack_info.current_sprite <= 7 then @arms else @legs
+        @attack_info.offset = if @attack_info.current_sprite <= 7 then 4 else 8
+        @attack_info.attack_started = false
+        @attack_info.last_frame = @attack_info.attack_holder.frame_per_animation[@attack_info.current_sprite] * 10
+        @attack_info.start_frame = @attack_info.attack_holder.attributes.attack_start_frame[@attack_info.current_sprite - @attack_info.offset]
+        @state.attack = true
+        @frame = 0
 
 loadPlayer = (environment, def, pos, human) ->
     result = {
@@ -178,6 +232,8 @@ loadPlayer = (environment, def, pos, human) ->
     result
 
 animateAsP1 = (environment, player) ->
+    if environment.keys[environment.constants.BUTTON_HIGH_PUNCH] && player.canAttack()
+        player.attack("high_punch")
     if environment.keys[environment.constants.KEY_LEFT] && player.canMove()
         player.move(environment, -1)
     if environment.keys[environment.constants.KEY_RIGHT] && player.canMove()

@@ -22,16 +22,24 @@ class GameLoop extends Loop
         {"loaded": @l_p1, "content": @state.p1} = loadPlayer(environment, p1_def, environment.constants.P1_INIT_POS, 1)
         {"loaded": @l_p2, "content": @state.p2} = loadPlayer(environment, p2_def, environment.constants.P2_INIT_POS, 0)
         {"loaded": @l_stage, "content": @state.stage} = loadStage(stage)
+        @attacks = []
     isReady: -> (@l_p1._ & @l_p2._ & @l_stage._)
     animate: (environment) ->
         @state.p1.animate(environment)
         @state.p2.animate(environment)
         @state.stage.animate(environment)
+        for attack in @attacks
+            attack.animate(environment)
+        @attacks = @attacks.filter((x) -> !x.is_finished)
     draw: (environment) ->
         @state.p1.draw(environment)
         @state.p2.draw(environment)
+        for attack in @attacks
+            attack.draw(environment)
         @state.stage.draw(environment)
     clear: (environment) ->
+        for attack in @attacks
+            attack.clear(environment)
         @state.p1.clear(environment)
         @state.p2.clear(environment)
 
