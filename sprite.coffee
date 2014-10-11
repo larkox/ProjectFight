@@ -29,6 +29,12 @@ class Sprite
         dim = @dimensions[@current_sprite]
         rect = {"x": @pos.x, "y": @pos.y, "w": dim.w, "h": dim.h}
         environment.clear(rect)
+    getRect: ->
+        {
+            "x": @pos.x, "y": @pos.y,
+            "w": @dimensions[@current_sprite].w,
+            "h": @dimensions[@current_sprite].h
+        }
 
 class Piece extends Sprite
     constructor: (pos, definition) ->
@@ -95,6 +101,7 @@ class AttackDefinition extends Sprite
         super({"x": 0, "y": 0}, definition)
         @base_points = definition.base_points
         @type = definition.type
+        @multiplier = definition.multiplier
     @loadAttacks: (environment, definition) ->
         result = {}
         for key, value of definition
@@ -133,12 +140,24 @@ class Attack extends Sprite
             @current_state = 0
         if @current_sprite >= @frame_per_animation.length
             @no_draw = true
+        unless @no_draw
+            @checkCollision(environment)
     draw: (environment) ->
         if !@no_draw
             super(environment)
     clear: (environment) ->
         if @no_draw then @is_finished = true else super(environment)
-
+    checkCollision: (environment) ->
+        foe = if environment.loop.state.p1 == @owner then environment.loop.state.p2 else environment.loop.state.p1
+        thisRect = @getRect()
+        if (rectCollide(thisRect, foe.bounding_rect))
+            if (
+                rectCollide(thisRect, foe.legs.getRect()) or
+                rectCollide(thisRect, foe.body.getRect()) or
+                rectCollide(thisRect, foe.head.getRect()) or
+                rectCollide(thisRect, foe.arms.getRect()))
+                @no_draw = true
+                foe.receiveDamage(environment, @power, @type)
     @attack_behaviours: {
         "static": (attack, environment) ->
         "straight": (attack, environment) ->
@@ -146,3 +165,9 @@ class Attack extends Sprite
             if attack.pos.x > environment.loop.state.stage.width
                 attack.no_draw = true
         }
+
+
+rectCollide = ({"x": x1,"y": y1,"w": w1,"h": h1}, {"x": x2,"y": y2,"w": w2,"h": h2}) ->
+    x = (x1 <= x2 <= x1 + w1) or (x2 <= x1 <= x2 + w2)
+    y = (y1 <= y2 <= y1 + h1) or (y2 <= y1 <= y2 + h2)
+    x and y

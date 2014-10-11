@@ -22,8 +22,9 @@ class GameLoop extends Loop
         {"loaded": @l_p1, "content": @state.p1} = loadPlayer(environment, p1_def, environment.constants.P1_INIT_POS, 1)
         {"loaded": @l_p2, "content": @state.p2} = loadPlayer(environment, p2_def, environment.constants.P2_INIT_POS, 0)
         {"loaded": @l_stage, "content": @state.stage} = loadStage(stage)
+        {"loaded": @l_UI, "content": @UI_image} = loadImage("src/images/UI.png")
         @attacks = []
-    isReady: -> (@l_p1._ & @l_p2._ & @l_stage._)
+    isReady: -> (@l_p1._ and @l_p2._ and @l_stage._ and @l_UI._)
     animate: (environment) ->
         @state.p1.animate(environment)
         @state.p2.animate(environment)
@@ -37,11 +38,22 @@ class GameLoop extends Loop
         for attack in @attacks
             attack.draw(environment)
         @state.stage.draw(environment)
+        @drawUI(environment)
     clear: (environment) ->
         for attack in @attacks
             attack.clear(environment)
         @state.p1.clear(environment)
         @state.p2.clear(environment)
+    drawUI: (environment) ->
+        environment.clearForeground(environment.constants.UI_RECT)
+        mult = @state.p1.hit_points / @state.p1.max_hit_points
+        unless mult <= 0
+            showing = {"x": 0, "y": 0, "w": 200 * mult, "h": 20}
+            environment.drawForeground(@UI_image, showing, {"x": 10, "y": 10})
+        mult = @state.p2.hit_points / @state.p2.max_hit_points
+        unless mult <= 0
+            showing = {"x": 200 * (1 - mult), 0, "y": 20, "w": 200 * mult, "h": 20}
+            environment.drawForeground(@UI_image, showing, {"x": 260 + 200 * (1- mult), "y": 10})
 
 class MainMenuLoop extends Loop
     constructor: (environment) ->

@@ -1,4 +1,6 @@
 constants = {
+    "UI_RECT": {"x": 0, "y": 0, "w": 800, "h": 40},
+
     "MENU_BUTTONS_POS": {"x": 100, "y": 100},
     "MENU_BUTTONS_WIDTH": 100,
     "MENU_BUTTONS_HEIGHT": 200,

@@ -22,6 +22,7 @@ class Player
         @defense = @body.attributes.defense
         @s_defense = @body.attributes.special_defense
         @a_defense = @arms.attributes.defense
+        @max_hit_points = @body.attributes.hit_points
         @hit_points = @body.attributes.hit_points
         movement_multiplier = @calculateMovementMultiplier()
         @movement = Math.round(@legs.attributes.movement * movement_multiplier)
@@ -141,8 +142,8 @@ class Player
                 environment.loop.attacks.push(new Attack(
                     @getAttackPos()
                     @attacks[@attack_info.type],
-                    @power,
-                    @special_power,
+                    @attack_info.base_power,
+                    @s_power,
                     @))
                 @attack_info.attack_started = true
             if (@frame > @attack_info.last_frame)
@@ -212,11 +213,21 @@ class Player
             when type == "special_kick_2" then 11
         @attack_info.attack_holder = if @attack_info.current_sprite <= 7 then @arms else @legs
         @attack_info.offset = if @attack_info.current_sprite <= 7 then 4 else 8
+        @attack_info.base_power = if @attack_info.current_sprite <= 7 then @a_power else @l_power
         @attack_info.attack_started = false
         @attack_info.last_frame = @attack_info.attack_holder.frame_per_animation[@attack_info.current_sprite] * 10
         @attack_info.start_frame = @attack_info.attack_holder.attributes.attack_start_frame[@attack_info.current_sprite - @attack_info.offset]
         @state.attack = true
         @frame = 0
+    receiveDamage: (environment, dealt_damage, type) ->
+        dealt_damage -= switch
+            when type == "normal" then @defense
+            when type == "special" then @s_defense
+            when type == "mixed" then (@defense + @s_defense) / 2
+        dealt_damage -= if @state.defend then @a_defense else 0
+        dealt_damage = Math.max(0, dealt_damage)
+        @hit_points -= dealt_damage
+        @hit_points = Math.max(0, @hit_points)
 
 loadPlayer = (environment, def, pos, human) ->
     result = {

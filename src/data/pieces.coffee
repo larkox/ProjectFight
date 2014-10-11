@@ -103,7 +103,7 @@ pieces = [
             "type": "arm",
             "name": "Basic Arm",
             "weight": 5.0,
-            "power": 1.0,
+            "power": 5.0,
             "defense": 1.0,
             "base_points": [
                 [{"x":0, "y":40}, {"x":80, "y":40}],
