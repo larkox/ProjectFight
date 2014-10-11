@@ -151,11 +151,13 @@ class Attack extends Sprite
         foe = if environment.loop.state.p1 == @owner then environment.loop.state.p2 else environment.loop.state.p1
         thisRect = @getRect()
         if (rectCollide(thisRect, foe.bounding_rect))
+            mini_canvas1 = environment.alphaCollision.canvas1
+            mini_canvas2 = environment.alphaCollision.canvas2
             if (
-                rectCollide(thisRect, foe.legs.getRect()) or
-                rectCollide(thisRect, foe.body.getRect()) or
-                rectCollide(thisRect, foe.head.getRect()) or
-                rectCollide(thisRect, foe.arms.getRect()))
+                rectCollide(thisRect, foe.legs.getRect()) and alphaCollide(this, foe.legs, mini_canvas1, mini_canvas2) or
+                rectCollide(thisRect, foe.body.getRect()) and alphaCollide(this, foe.body, mini_canvas1, mini_canvas2) or
+                rectCollide(thisRect, foe.head.getRect()) and alphaCollide(this, foe.head, mini_canvas1, mini_canvas2) or
+                rectCollide(thisRect, foe.arms.getRect()) and alphaCollide(this, foe.arms, mini_canvas1, mini_canvas2))
                 @no_draw = true
                 foe.receiveDamage(environment, @power, @type)
     @attack_behaviours: {
@@ -166,6 +168,33 @@ class Attack extends Sprite
                 attack.no_draw = true
         }
 
+alphaCollide = (sprite1, sprite2, mini_canvas1, mini_canvas2) ->
+                {rect1, rect2} = collideArea(sprite1.getRect(), sprite2.getRect())
+                if rect1.w <= 0 or rect1.h <= 0 or rect2.w <= 0 or rect2.h <= 0
+                    return false
+                rect_base1 = sprite1.getShowingRect()
+                rect_base2 = sprite2.getShowingRect()
+                mini_canvas1.drawImage(sprite1.image, rect_base1.x + rect1.x, rect_base1.y + rect1.y, rect1.w, rect1.h, 0, 0, rect1.w, rect1.h)
+                mini_canvas2.drawImage(sprite2.image, rect_base2.x + rect2.x, rect_base2.y + rect2.y, rect2.w, rect2.h, 0, 0, rect2.w, rect2.h)
+                data1 = mini_canvas1.getImageData(0, 0, rect1.w, rect1.h).data
+                data2 = mini_canvas2.getImageData(0, 0, rect2.w, rect2.h).data
+                for value, index in data1 when index % (4*5) == 0
+                    if (data1[index+3] > 100 and data2[index+3] > 100)
+                        mini_canvas1.clearRect(0, 0, rect1.w, rect1.h)
+                        mini_canvas2.clearRect(0, 0, rect2.w, rect2.h)
+                        return true
+                mini_canvas1.clearRect(0, 0, rect1.w, rect1.h)
+                mini_canvas2.clearRect(0, 0, rect2.w, rect2.h)
+                false
+
+collideArea = ({"x": x1,"y": y1,"w": w1,"h": h1}, {"x": x2,"y": y2,"w": w2,"h": h2}) ->
+    xa = Math.max(x1,x2)
+    ya = Math.max(y1,y2)
+    xb = Math.min(x1 + w1, x2 + w2)
+    yb = Math.min(y1 + h1, y2 + w2)
+    rect1 = {"x": xa - x1, "y": ya - y1, "w": xb - xa, "h": yb - ya}
+    rect2 = {"x": xa - x2, "y": ya - y2, "w": xb - xa, "h": yb - ya}
+    {"rect1": rect1, "rect2": rect2}
 
 rectCollide = ({"x": x1,"y": y1,"w": w1,"h": h1}, {"x": x2,"y": y2,"w": w2,"h": h2}) ->
     x = (x1 <= x2 <= x1 + w1) or (x2 <= x1 <= x2 + w2)

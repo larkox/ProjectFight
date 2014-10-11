@@ -18,6 +18,9 @@ class Environment
         document.onmouseup = (event) => @onMouseUp(event)
         document.onmousemove = (event) => @onMouseMove(event)
         setTimeout((=> @tick()), @loop.frame_time)
+        @alphaCollision = {}
+        @alphaCollision.canvas1 = document.createElement("canvas").getContext("2d")
+        @alphaCollision.canvas2 = document.createElement("canvas").getContext("2d")
     drawSprite: (img, rect, pos) ->
         @layers[1].drawImage(img, rect.x, rect.y, rect.w, rect.h,
             pos.x, pos.y, rect.w, rect.h)
