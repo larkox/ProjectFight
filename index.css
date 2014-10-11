@@ -1,0 +1,19 @@
+.gameCanvas {
+    position: absolute;
+    top:0px;
+    left:0px;
+}
+#backLayer {
+    z-index: -2;
+}
+#middleLayer {
+    z-index: -1;
+}
+#frontLayer {
+    z-index: -0;
+}
+#controls {
+    position: absolute;
+    top: 450px;
+    padding-bottom: 20px;
+}

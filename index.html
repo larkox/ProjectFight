@@ -3,12 +3,26 @@
     <head>
         <meta charset="UTF-8" />
         <title>Project Fight</title>
+        <link rel="stylesheet" type="text/css" href="index.css" />
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="app.js"></script>
     </head>
     <body onload="new Environment()">
-        <canvas id="backLayer" width="800" height="450" style="position:absolute;top:0;left:0;z-index:-2"></canvas>
-        <canvas id="middleLayer" width="800" height="450" style="position:absolute;top:0;left:0;z-index:-1"></canvas>
-        <canvas id="frontLayer" width="800" height="450" style="position:absolute;top:0;left:0;z-index:0"></canvas>
+        <div id="canvas_container">
+            <canvas class="gameCanvas" id="backLayer" width=800 height=450></canvas>
+            <canvas class="gameCanvas" id="middleLayer" width=800 height=450></canvas>
+            <canvas class="gameCanvas" id="frontLayer" width=800 height=450></canvas>
+        </div>
+        <div id="controls">
+            <h2>Controls</h2>
+            Move: Left and right arrows</br>
+            Jump: Up arrow</br>
+            Crouch: Down arrow</br>
+            Defend: Z</br>
+            High Punch: S</br>
+            Medium Punch: D</br>
+            Medium Kick: X</br>
+            Low Kick: C</br>
+        </div>
     </body>
 </html>
